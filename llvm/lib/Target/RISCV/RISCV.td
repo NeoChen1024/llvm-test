@@ -54,6 +54,7 @@ include "RISCVSchedSyntacoreSCR1.td"
 include "RISCVSchedSyntacoreSCR345.td"
 include "RISCVSchedSyntacoreSCR7.td"
 include "RISCVSchedXiangShanNanHu.td"
+include "RISCVSchedNeoTechNeoRV1.td"
 
 //===----------------------------------------------------------------------===//
 // RISC-V processors supported.
