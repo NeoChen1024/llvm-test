@@ -13,7 +13,7 @@
 // NeoRV1 is an out-of-order superscalar octal-issue core.
 // FIXME: add V and Zkn extensions scheduling model
 def NeoTechNeoRV1Model : SchedMachineModel {
-  let MicroOpBufferSize = 64;
+  let MicroOpBufferSize = 256;
   let IssueWidth = 8;
   let MispredictPenalty = 9;
   let LoadLatency = 3;
@@ -346,18 +346,18 @@ let SchedModel = NeoTechNeoRV1Model in {
   // Second station:
   //   - ALU (+ bitmanip and scalar crypto)
   //   - Non-pipelined divider (other units are not blocked)
-  def NeoRV1_ALU_MUL_IS : ProcResource<1> { let BufferSize = 8; }
-  def NeoRV1_ALU_DIV_IS : ProcResource<1> { let BufferSize = 8; }
+  def NeoRV1_ALU_MUL_IS : ProcResource<4> { let BufferSize = 16; }
+  def NeoRV1_ALU_DIV_IS : ProcResource<4> { let BufferSize = 16; }
   def NeoRV1_ALU_Any : ProcResGroup<[NeoRV1_ALU_MUL_IS, NeoRV1_ALU_DIV_IS]>;
-  def NeoRV1_MUL : ProcResource<1> { let BufferSize = 1; }
-  def NeoRV1_DIV : ProcResource<1> { let BufferSize = 1; }
+  def NeoRV1_MUL : ProcResource<2> { let BufferSize = 1; }
+  def NeoRV1_DIV : ProcResource<2> { let BufferSize = 1; }
 
   defm : NeoRV1_IntPipeline<NeoRV1_ALU_Any,
                          NeoRV1_ALU_DIV_IS, NeoRV1_DIV,
                          NeoRV1_ALU_MUL_IS, NeoRV1_MUL>;
 
   // SCR7 single-issue LSU with sixteen entries.
-  def NeoRV1_LSU : ProcResource<1> { let BufferSize = 16; }
+  def NeoRV1_LSU : ProcResource<1> { let BufferSize = 64; }
   defm : NeoRV1_BasicMemory<NeoRV1_LSU>;
   defm : NeoRV1_AtomicMemory<NeoRV1_LSU>;
 
@@ -365,9 +365,9 @@ let SchedModel = NeoTechNeoRV1Model in {
   //   - FP ALU
   //   - FMA
   //   - Non-pipelined FDIV/FSQRT
-  def NeoRV1_FPU_IS : ProcResource<1> { let BufferSize = 8; }
-  def NeoRV1_FALU : ProcResource<1> { let BufferSize = 1; }
-  def NeoRV1_FMA : ProcResource<1> { let BufferSize = 1; }
+  def NeoRV1_FPU_IS : ProcResource<4> { let BufferSize = 16; }
+  def NeoRV1_FALU : ProcResource<2> { let BufferSize = 1; }
+  def NeoRV1_FMA : ProcResource<2> { let BufferSize = 1; }
   def NeoRV1_FDIVSQRT : ProcResource<1> { let BufferSize = 1; }
   defm : NeoRV1_FPU<NeoRV1_FPU_IS, NeoRV1_FALU, NeoRV1_FMA, NeoRV1_FDIVSQRT>;
 
