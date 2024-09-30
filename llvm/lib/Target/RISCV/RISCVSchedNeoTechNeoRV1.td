@@ -123,7 +123,15 @@ multiclass NeoRV1_IntPipeline<ProcResourceKind ALU_Any,
                             ProcResourceKind ALU_DIV_IS,
                             ProcResourceKind DIV,
                             ProcResourceKind ALU_MUL_IS,
-                            ProcResourceKind MUL> {
+                            ProcResourceKind MUL,
+                            ProcResourceKind GEN_IS_1,
+                            ProcResourceKind GEN_ALU_1,
+                            ProcResourceKind GEN_IS_2,
+                            ProcResourceKind GEN_ALU_2,
+                            ProcResourceKind GEN_IS_3,
+                            ProcResourceKind GEN_ALU_3,
+                            ProcResourceKind GEN_IS_4,
+                            ProcResourceKind GEN_ALU_4> {
   defm : NeoRV1_Branching<ALU_Any>;
   defm : NeoRV1_Bitmanip<ALU_Any>;
   defm : NeoRV1_ScalarCrypto<ALU_Any>;
@@ -346,18 +354,31 @@ let SchedModel = NeoTechNeoRV1Model in {
   // Second station:
   //   - ALU (+ bitmanip and scalar crypto)
   //   - Non-pipelined divider (other units are not blocked)
-  def NeoRV1_ALU_MUL_IS : ProcResource<4> { let BufferSize = 16; }
-  def NeoRV1_ALU_DIV_IS : ProcResource<4> { let BufferSize = 16; }
-  def NeoRV1_ALU_Any : ProcResGroup<[NeoRV1_ALU_MUL_IS, NeoRV1_ALU_DIV_IS]>;
-  def NeoRV1_MUL : ProcResource<2> { let BufferSize = 1; }
-  def NeoRV1_DIV : ProcResource<2> { let BufferSize = 1; }
+  def NeoRV1_ALU_MUL_IS : ProcResource<1> { let BufferSize = 16; }
+  def NeoRV1_ALU_DIV_IS : ProcResource<1> { let BufferSize = 16; }
+  def NeoRV1_ALU_IS_1 : ProcResource<1> { let BufferSize = 16; }
+  def NeoRV1_ALU_IS_2 : ProcResource<1> { let BufferSize = 16; }
+  def NeoRV1_ALU_IS_3 : ProcResource<1> { let BufferSize = 16; }
+  def NeoRV1_ALU_IS_4 : ProcResource<1> { let BufferSize = 16; }
+  def NeoRV1_ALU_Any : ProcResGroup<[NeoRV1_ALU_MUL_IS, NeoRV1_ALU_DIV_IS,
+	NeoRV1_ALU_IS_1, NeoRV1_ALU_IS_2, NeoRV1_ALU_IS_3, NeoRV1_ALU_IS_4]>;
+  def NeoRV1_MUL : ProcResource<1> { let BufferSize = 1; }
+  def NeoRV1_DIV : ProcResource<1> { let BufferSize = 1; }
+  def NeoRV1_GEN_ALU_1 : ProcResource<1> { let BufferSize = 1; }
+  def NeoRV1_GEN_ALU_2 : ProcResource<1> { let BufferSize = 1; }
+  def NeoRV1_GEN_ALU_3 : ProcResource<1> { let BufferSize = 1; }
+  def NeoRV1_GEN_ALU_4 : ProcResource<1> { let BufferSize = 1; }
 
   defm : NeoRV1_IntPipeline<NeoRV1_ALU_Any,
                          NeoRV1_ALU_DIV_IS, NeoRV1_DIV,
-                         NeoRV1_ALU_MUL_IS, NeoRV1_MUL>;
+                         NeoRV1_ALU_MUL_IS, NeoRV1_MUL,
+			 NeoRV1_ALU_IS_1, NeoRV1_GEN_ALU_1,
+			 NeoRV1_ALU_IS_2, NeoRV1_GEN_ALU_2,
+			 NeoRV1_ALU_IS_3, NeoRV1_GEN_ALU_3,
+			 NeoRV1_ALU_IS_4, NeoRV1_GEN_ALU_4>;
 
   // SCR7 single-issue LSU with sixteen entries.
-  def NeoRV1_LSU : ProcResource<1> { let BufferSize = 64; }
+  def NeoRV1_LSU : ProcResource<4> { let BufferSize = 64; }
   defm : NeoRV1_BasicMemory<NeoRV1_LSU>;
   defm : NeoRV1_AtomicMemory<NeoRV1_LSU>;
 
